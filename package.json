@@ -1,0 +1,32 @@
+{
+  "name": "travelbot",
+  "version": "0.1.0",
+  "description": "Bots to search for journeys",
+  "main": "travelbot.js",
+  "dependencies": {
+    "travel-scrapper": "0.1.2",
+    "queread": "0.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/espadrine/travelbot.git"
+  },
+  "keywords": [
+    "bot",
+    "travel",
+    "journey",
+    "trips",
+    "NLP",
+    "train"
+  ],
+  "author": "Thaddée Tyl",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/espadrine/travelbot/issues"
+  },
+  "homepage": "https://github.com/espadrine/travelbot#readme"
+}
