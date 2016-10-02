@@ -132,10 +132,4 @@ function stringError() {
   return 'Sorry, I got confused. Can you ask again differently?'
 }
 
-process.stdin.setEncoding('utf8')
-process.stdin.on('readable', () => {
-  let chunk = process.stdin.read()
-  if (chunk !== null) {
-    respond(String(chunk))
-  }
-})
+module.exports = respond
