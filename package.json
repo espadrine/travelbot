@@ -1,11 +1,12 @@
 {
   "name": "travelbot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Bots to search for journeys",
   "main": "travelbot.js",
   "dependencies": {
-    "travel-scrapper": "0.1.2",
-    "queread": "0.1.0"
+    "botkit": "^0.2.2",
+    "queread": "^0.1.1",
+    "travel-scrapper": "^0.1.3"
   },
   "devDependencies": {},
   "scripts": {
