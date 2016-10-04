@@ -7,14 +7,24 @@ let datafile = fs.readFileSync(path.join(__dirname, './data/set'))
 let dataset = Bot.parse(String(datafile))
 let bot = new Bot(dataset)
 
+// Return the id of a station name.
+function stationMatch(name) {
+  return stationFromName.get(name.toLowerCase())
+}
+
+let stationFromName = new Map()
+station.forEach(station =>
+  stationFromName.set(station.name.toLowerCase(), station))
+
 // Added tokenizers.
 bot.addParameter(function origin(tokens) {
   let previousToken = tokens.last()
   if (previousToken !== undefined && previousToken.type === 'word'
       && previousToken.tag === 'from') {
     let match = /^\w+/.exec(tokens.rest())
-    if (match !== null) {
-      return { tag: 'origin', length: match[0].length, data: match[0] }
+    let station = stationMatch(match[0])
+    if (station !== undefined) {
+      return { tag: 'origin', length: match[0].length, data: station.id }
     }
   }
 })
@@ -23,8 +33,9 @@ bot.addParameter(function destination(tokens) {
   if (previousToken !== undefined && previousToken.type === 'word'
       && previousToken.tag === 'to') {
     let match = /^\w+/.exec(tokens.rest())
-    if (match !== null) {
-      return { tag: 'destination', length: match[0].length, data: match[0] }
+    let station = stationMatch(match[0])
+    if (station !== undefined) {
+      return { tag: 'destination', length: match[0].length, data: station.id }
     }
   }
 })
@@ -35,15 +46,20 @@ bot.addParameter(function destination(tokens) {
   }
 })
 
+// Session information.
+let session = {}
+
 // Read some natural language input, return responses
 // as {text: String} from answer().
 function respond(input, answer) {
   let query = bot.guess(input)
   if (query.label === 'search') {
-    if (query.parameters.origin !== undefined &&
-        query.parameters.destination !== undefined) {
-      let origin = station.name(query.parameters.origin)
-      let destination = station.name(query.parameters.destination)
+    session.origin = query.parameters.origin || session.origin
+    session.destination = query.parameters.destination || session.destination
+    if (session.origin !== undefined &&
+        session.destination !== undefined) {
+      let origin = station.id(session.origin)
+      let destination = station.id(session.destination)
       if (origin !== undefined && destination !== undefined) {
         answer({text: 'Let me see what I can find…'})
         travel.search(origin.id, destination.id)
@@ -53,8 +69,15 @@ function respond(input, answer) {
       }
     }
     // If we have not returned yet, we are missing data.
-    answer({text: 'Well, where will you come from, and where will you go, ' +
-      'Cotton-Eye Joe?'})
+    if (session.origin === undefined &&
+        session.destination === undefined) {
+      answer({text: 'Well, where will you come from, and where will you go, ' +
+        'Cotton-Eye Joe?'})
+    } else if (session.origin === undefined) {
+      answer({text: 'Where will you leave from?'})
+    } else {
+      answer({text: 'Where do you want to go?'})
+    }
   } else if (query.label === 'hi') {
     answer({text: 'Hello, human.'})
   } else if (query.label === 'help') {
