@@ -35,8 +35,9 @@ bot.addParameter(function destination(tokens) {
   }
 })
 
-// Read some natural language input, write the response out.
-function respond(input) {
+// Read some natural language input, return responses
+// as {text: String} from answer().
+function respond(input, answer) {
   let query = bot.guess(input)
   if (query.label === 'search') {
     if (query.parameters.origin !== undefined &&
@@ -44,19 +45,33 @@ function respond(input) {
       let origin = station.name(query.parameters.origin)
       let destination = station.name(query.parameters.destination)
       if (origin !== undefined && destination !== undefined) {
-        console.log('Let me see what I can find…')
+        answer({text: 'Let me see what I can find…'})
         travel.search(origin.id, destination.id)
-        .then(travelPlans => console.log(stringTravelPlans(travelPlans)))
-        .catch(e => { console.error(e); console.log(stringError()) })
+        .then(travelPlans => answer({text: stringTravelPlans(travelPlans)}))
+        .catch(e => { console.error(e); answer({text: stringError()}) })
         return
       }
     }
     // If we have not returned yet, we are missing data.
-    // TODO
-    console.log('We are missing data.')
-    console.log(query)
+    answer({text: 'Well, where will you come from, and where will you go, ' +
+      'Cotton-Eye Joe?'})
+  } else if (query.label === 'hi') {
+    answer({text: 'Hello, human.'})
+  } else if (query.label === 'help') {
+    answer({text: 'You can ask me, for instance, “How do I go ' +
+      'from Lille to Paris?”.'})
+  } else if (query.label === 'self') {
+    answer({text: 'I give travel information across Europe.\n' +
+      'My understanding relies on a word graph with edges weighted by the ' +
+      'meaning provided during training.\n' +
+      'My author is Thaddée Tyl.'})
+  } else if (query.label === 'bad') {
+    answer({text: 'I will improve.'})
+  } else if (query.label === 'hitchhiker') {
+    answer({text: '42.'})
   } else {
-    console.log('Sorry, I do not understand what you said. Ask me: “What can you understand?”')
+    answer({text: 'Sorry, I do not understand what you said. ' +
+      'Ask me: “What can you understand?”'})
   }
 }
 

@@ -1,8 +1,17 @@
-search: Can you /get/ me a train [vehicle] /to/ Brighton [destination]?
-search: I want to /go/ /to/ Warsaw [destination].
-search: We /leave/ /at/ 20:30 [time] [departure] /from/ Milano [origin].
-search: /How/ /do/ I /go/ /from/ Manchester [origin] /to/ Milano [destination] /on/ Saturday [time] [departure]?
-select: I /will/ /take/ the second [number] [selection] /option/.
-select: I /will/ /have/ /option/ 1 [number] [selection].
-select: I /want/ /number/ 2 [number] [selection].
-select: /The/ first [number] [selection] /is/ /good/.
+search: Can you get me a train [vehicle] to Brighton [destination]?
+search: I want to go to Warsaw [destination].
+search: We leave at 20:30 [time] [departure] from Milano [origin].
+search: How do I go from Manchester [origin] to Milano [destination] on Saturday [time] [departure]?
+select: I will take the second [number] [selection] option.
+select: I will have option 1 [number] [selection].
+select: I want number 2 [number] [selection].
+select: The first [number] [selection] is good.
+hi: Hi!
+hi: Hello!
+self: Who are you?
+self: Who is this?
+help: What can you understand?
+bad: You suck.
+bad: This sucks.
+bad: You are bad.
+hitchhiker: What is the answer to life, the universe, and everything?
