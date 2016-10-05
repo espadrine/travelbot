@@ -46,6 +46,35 @@ bot.addParameter(function destination(tokens) {
   }
 })
 
+// Receive {hour, minute, …} (or undefined), return a Date.
+// sessionDate is a previously used Date.
+function buildDate(time, sessionDate) {
+  if (time === undefined) {
+    return sessionDate
+  }
+  let now = new Date()
+  sessionDate = sessionDate || now
+  let year = time.year
+  year = (year !== undefined)? year: sessionDate.getFullYear()
+  year = (year !== undefined)? year: now.getFullYear()
+  let month = time.month
+  month = (month !== undefined)? month: sessionDate.getMonth()
+  month = (month !== undefined)? month: now.getMonth()
+  let day = time.day
+  day = (day !== undefined)? day: sessionDate.getDate()
+  day = (day !== undefined)? day: now.getDate()
+  let hour = time.hour
+  hour = (hour !== undefined)? hour: sessionDate.getHours()
+  hour = (hour !== undefined)? hour: now.getHours()
+  let minute = time.minute
+  minute = (minute !== undefined)? minute: sessionDate.getMinutes()
+  minute = (minute !== undefined)? minute: now.getMinutes()
+  let second = time.second
+  second = (second !== undefined)? second: sessionDate.getSeconds()
+  second = (second !== undefined)? second: now.getSeconds()
+  return new Date(year, month, day, hour, minute, second)
+}
+
 // Session information.
 let session = {}
 
@@ -60,9 +89,12 @@ function respond(input, answer) {
         session.destination !== undefined) {
       let origin = station.id(session.origin)
       let destination = station.id(session.destination)
+      session.departure = buildDate(
+        query.parameters.departure, session.departure)
+      let departure = session.departure
       if (origin !== undefined && destination !== undefined) {
         answer({text: 'Let me see what I can find…'})
-        travel.search(origin.id, destination.id)
+        travel.search(origin.id, destination.id, {departure})
         .then(travelPlans => answer({text: stringTravelPlans(travelPlans)}))
         .catch(e => { console.error(e); answer({text: stringError()}) })
         return
