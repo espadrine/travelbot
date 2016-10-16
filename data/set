@@ -6,6 +6,7 @@ select: I will take the second [integer] [selection] option.
 select: I will have option 1 [integer] [selection].
 select: I want number 2 [integer] [selection].
 select: The first [integer] [selection] is good.
+locate: Where is Warsaw [location]?
 hi: Hi!
 hi: Hello!
 self: Who are you?

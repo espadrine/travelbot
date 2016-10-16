@@ -13,29 +13,76 @@ function stationMatch(name) {
 }
 
 let stationFromName = new Map()
-station.forEach(station =>
-  stationFromName.set(station.name.toLowerCase(), station))
+station.forEach(station => {
+  let lowercase = station.name.toLowerCase()
+  stationFromName.set(lowercase, station)
+  let part = lowercase.match(/^\S+/)
+  if (part !== null) {
+    stationFromName.set(part[0], station)
+  }
+})
 
 // Added tokenizers.
+bot.addParameter(function origin(tokens) {
+  let previousToken = tokens.last()
+  if (previousToken !== undefined && previousToken.type === 'word') {
+    let rest = tokens.rest()
+    let match = /^\w+/.exec(rest)
+    if (match !== null) {
+      let station = stationMatch(match[0])
+      if (station !== undefined) {
+        return { tag: 'location', length: match[0].length, data: station.id }
+      }
+    }
+
+    // Where is that?
+    if (previousToken.tag === 'is') {
+      let prevPrevToken = tokens.tokens[tokens.tokens.length - 2]
+      if (prevPrevToken !== undefined && prevPrevToken.type === 'word' &&
+          prevPrevToken.tag === 'where') {
+        match = /^(that|it)\b/.exec(rest)
+        if (match !== null && session.destination !== undefined) {
+          return { tag: 'location', length: match[0].length,
+            data: session.destination }
+        }
+      }
+    }
+    if (previousToken.tag === 'where') {
+      match = /^(that|it) +is\b/.exec(rest)
+      if (match !== null && session.destination !== undefined) {
+        return { tag: 'location', length: match[1].length,
+          data: session.destination }
+      }
+    }
+  }
+})
 bot.addParameter(function origin(tokens) {
   let previousToken = tokens.last()
   if (previousToken !== undefined && previousToken.type === 'word'
       && previousToken.tag === 'from') {
     let match = /^\w+/.exec(tokens.rest())
-    let station = stationMatch(match[0])
-    if (station !== undefined) {
-      return { tag: 'origin', length: match[0].length, data: station.id }
+    if (match !== null) {
+      let name = match[0]
+      if (/^t?here$/.test(name)) { name = session.location }
+      let station = stationMatch(name)
+      if (station !== undefined) {
+        return { tag: 'origin', length: match[0].length, data: station.id }
+      }
     }
   }
 })
 bot.addParameter(function destination(tokens) {
   let previousToken = tokens.last()
   if (previousToken !== undefined && previousToken.type === 'word'
-      && previousToken.tag === 'to') {
+      && (previousToken.tag === 'to' || previousToken.tag === 'go')) {
     let match = /^\w+/.exec(tokens.rest())
-    let station = stationMatch(match[0])
-    if (station !== undefined) {
-      return { tag: 'destination', length: match[0].length, data: station.id }
+    if (match !== null) {
+      let name = match[0]
+      if (/^t?here$/.test(name)) { name = session.location }
+      let station = stationMatch(name)
+      if (station !== undefined) {
+        return { tag: 'destination', length: match[0].length, data: station.id }
+      }
     }
   }
 })
@@ -123,6 +170,21 @@ function respond(input, answer) {
       answer({text: 'Where will you leave from?'})
     } else {
       answer({text: 'Where do you want to go?'})
+    }
+  } else if (query.label === 'locate') {
+    session.location = query.parameters.location || session.location
+    let location = station.id(session.location)
+    if (location !== undefined) {
+      let lat = location.lat
+      let long = location.long
+      if (lat !== "" && long !== "") {
+        let mapLink = `https://www.google.com/maps/@${lat},${long},15z`
+        answer({text: `I found it here: ${mapLink}.`})
+      } else {
+        answer({text: "I don't know where that is."})
+      }
+    } else {
+      answer({text: "I cannot find it."})
     }
   } else if (query.label === 'hi') {
     answer({text: 'Hello, human.'})
