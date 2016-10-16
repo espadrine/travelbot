@@ -85,6 +85,9 @@ function buildDate(time, sessionDate) {
   return new Date(year, month - 1, day, hour, minute, second)
 }
 
+let ukDateFormat = new Intl.DateTimeFormat('en-GB',
+  {month: 'long', day: 'numeric', hour: 'numeric'}).format
+
 // Session information.
 let session = {}
 
@@ -103,7 +106,8 @@ function respond(input, answer) {
         query.parameters.departure, session.departure)
       let departure = session.departure
       if (origin !== undefined && destination !== undefined) {
-        answer({text: 'Let me see what I can find…'})
+        answer({text: `Let me see what I can find on ${
+          ukDateFormat(session.departure)}…`})
         travel.search(origin.id, destination.id, {departure})
         .then(travelPlans => answer({text: stringTravelPlans(travelPlans)}))
         .catch(e => { console.error(e); answer({text: stringError()}) })
