@@ -46,33 +46,43 @@ bot.addParameter(function destination(tokens) {
   }
 })
 
-// Receive {hour, minute, …} (or undefined), return a Date.
+// Receive {hour, minute, …} UTC (or undefined), return a Date.
 // sessionDate is a previously used Date.
 function buildDate(time, sessionDate) {
   if (time === undefined) {
     return sessionDate
   }
   let now = new Date()
-  sessionDate = sessionDate || now
   let year = time.year
-  year = (year !== undefined)? year: sessionDate.getFullYear()
-  year = (year !== undefined)? year: now.getFullYear()
+  if (year === undefined && sessionDate !== undefined) {
+    year = sessionDate.getFullYear() }
+  if (year === undefined) { year = now.getFullYear() }
   let month = time.month
-  month = (month !== undefined)? month: sessionDate.getMonth()
-  month = (month !== undefined)? month: now.getMonth()
+  if (month === undefined && sessionDate !== undefined) {
+    month = sessionDate.getMonth() + 1 }
+  if (month === undefined) { month = now.getMonth() + 1 }
   let day = time.day
-  day = (day !== undefined)? day: sessionDate.getDate()
-  day = (day !== undefined)? day: now.getDate()
+  if (day === undefined && sessionDate !== undefined) {
+    day = sessionDate.getDate() }
+  if (day === undefined) { day = now.getDate() }
   let hour = time.hour
-  hour = (hour !== undefined)? hour: sessionDate.getHours()
-  hour = (hour !== undefined)? hour: now.getHours()
+  if (hour === undefined && sessionDate !== undefined) {
+    hour = sessionDate.getHours() }
+  if (hour === undefined) {
+    if (day !== undefined) { hour = 6
+    } else { hour = now.getHours()
+    }
+  }
   let minute = time.minute
-  minute = (minute !== undefined)? minute: sessionDate.getMinutes()
-  minute = (minute !== undefined)? minute: now.getMinutes()
+  if (minute === undefined && sessionDate !== undefined) {
+    minute = sessionDate.getMinutes() }
+  if (minute === undefined) { minute = now.getMinutes() }
   let second = time.second
-  second = (second !== undefined)? second: sessionDate.getSeconds()
-  second = (second !== undefined)? second: now.getSeconds()
-  return new Date(year, month, day, hour, minute, second)
+  if (second === undefined && sessionDate !== undefined) {
+    second = sessionDate.getSeconds() }
+  if (second === undefined) { second = now.getSeconds() }
+
+  return new Date(year, month - 1, day, hour, minute, second)
 }
 
 // Session information.
