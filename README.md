@@ -1,6 +1,6 @@
 ```js
 const travelbot = require('travelbot')
-console.log(travelbot.respond('Get me from Paris to Berlin.'))
+console.log(travelbot.respond({text: 'Get me from Paris to Berlin.'}).text)
 ```
 
 # Interface
