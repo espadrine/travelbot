@@ -15,7 +15,9 @@ function stationMatch(name) {
 let stationFromName = new Map()
 station.forEach(station => {
   let lowercase = station.name.toLowerCase()
-  stationFromName.set(lowercase, station)
+  if (!stationFromName.has(lowercase)) {
+    stationFromName.set(lowercase, station)
+  }
   let part = lowercase.match(/^\S+/)
   if (part !== null) {
     let name = part[0]

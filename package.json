@@ -1,6 +1,6 @@
 {
   "name": "travelbot",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Bots to search for journeys",
   "main": "travelbot.js",
   "dependencies": {
