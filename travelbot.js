@@ -18,7 +18,11 @@ station.forEach(station => {
   stationFromName.set(lowercase, station)
   let part = lowercase.match(/^\S+/)
   if (part !== null) {
-    stationFromName.set(part[0], station)
+    let name = part[0]
+    if (name === 'the') { name = part[1] }
+    if (name !== undefined && !stationFromName.has(name)) {
+      stationFromName.set(name, station)
+    }
   }
 })
 
@@ -157,7 +161,7 @@ function respond(input, answer) {
           ukDateFormat(session.departure)}…`})
         travel.search(origin.id, destination.id, {departure})
         .then(travelPlans => answer({text: stringTravelPlans(travelPlans)}))
-        .catch(e => { console.error(e); answer({text: stringError()}) })
+        .catch(e => { console.error(e); answer({text: stringError(e)}) })
         return
       }
     }
@@ -195,7 +199,8 @@ function respond(input, answer) {
     answer({text: 'I give travel information across Europe.\n' +
       'My understanding relies on a word graph with edges weighted by the ' +
       'meaning provided during training.\n' +
-      'My author is Thaddée Tyl.'})
+      'My author is Thaddée Tyl. ' +
+      'I live at https://github.com/espadrine/travelbot.'})
   } else if (query.label === 'bad') {
     answer({text: 'I will improve.'})
   } else if (query.label === 'hitchhiker') {
@@ -274,8 +279,9 @@ function stringTime(time) {
   return `${h}:${m}`
 }
 
-function stringError() {
-  return 'Sorry, I got confused. Can you ask again differently?'
+function stringError(e) {
+  return 'Sorry, I got confused. Can you ask again differently?\n' +
+    '(All I know is “' + e + '”)'
 }
 
 module.exports = respond
