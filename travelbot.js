@@ -62,21 +62,6 @@ bot.addParameter(function origin(tokens) {
     }
   }
 })
-bot.addParameter(function origin(tokens) {
-  let previousToken = tokens.last()
-  if (previousToken !== undefined && previousToken.type === 'word'
-      && previousToken.tag === 'from') {
-    let match = /^\w+/.exec(tokens.rest())
-    if (match !== null) {
-      let name = match[0]
-      if (/^t?here$/.test(name)) { name = session.location }
-      let station = stationMatch(name)
-      if (station !== undefined) {
-        return { tag: 'origin', length: match[0].length, data: station.id }
-      }
-    }
-  }
-})
 bot.addParameter(function destination(tokens) {
   let previousToken = tokens.last()
   if (previousToken !== undefined && previousToken.type === 'word'
@@ -149,7 +134,7 @@ let session = {}
 function respond(input, answer) {
   let query = bot.guess(input)
   if (query.label === 'search') {
-    session.origin = query.parameters.origin || session.origin
+    session.origin = query.parameters.location || session.origin
     session.destination = query.parameters.destination || session.destination
     if (session.origin !== undefined &&
         session.destination !== undefined) {

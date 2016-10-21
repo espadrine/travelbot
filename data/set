@@ -1,7 +1,7 @@
 search: Can you get me a train [vehicle] to Brighton [destination]?
 search: I want to go to Warsaw [destination].
-search: We leave at 20:30 [time] [departure] from Milano [origin].
-search: How do I go from Manchester [origin] to Milano [destination] on Saturday [time] [departure]?
+search: We leave at 20:30 [time] [departure] from Milano [location].
+search: How do I go from Manchester [location] to Milano [destination] on Saturday [time] [departure]?
 select: I will take the second [integer] [selection] option.
 select: I will have option 1 [integer] [selection].
 select: I want number 2 [integer] [selection].
