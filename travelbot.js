@@ -29,17 +29,16 @@ station.forEach(station => {
 })
 
 // Added tokenizers.
-bot.addParameter(function origin(tokens) {
+bot.addParameter(function locationParameter(tokens) {
+  let rest = tokens.rest()
+  let match = /^\w+/.exec(rest)
+  if (match == null) {return}
+  let station = stationMatch(match[0])
+  if (station !== undefined) {
+    return { tag: 'location', length: match[0].length, data: station.id }
+  }
   let previousToken = tokens.last()
   if (previousToken !== undefined && previousToken.type === 'word') {
-    let rest = tokens.rest()
-    let match = /^\w+/.exec(rest)
-    if (match !== null) {
-      let station = stationMatch(match[0])
-      if (station !== undefined) {
-        return { tag: 'location', length: match[0].length, data: station.id }
-      }
-    }
 
     // Where is that?
     if (previousToken.tag === 'is') {
@@ -62,7 +61,7 @@ bot.addParameter(function origin(tokens) {
     }
   }
 })
-bot.addParameter(function destination(tokens) {
+bot.addParameter(function destinationParameter(tokens) {
   let previousToken = tokens.last()
   if (previousToken !== undefined && previousToken.type === 'word'
       && (previousToken.tag === 'to' || previousToken.tag === 'go')) {
@@ -77,7 +76,7 @@ bot.addParameter(function destination(tokens) {
     }
   }
 })
-bot.addParameter(function destination(tokens) {
+bot.addParameter(function vehicleParameter(tokens) {
   let match = /^(car|bus|metro|train|plane|boat)\b/.exec(tokens.rest())
   if (match !== null) {
     return { tag: 'vehicle', length: match[0].length, data: match[0] }
@@ -133,9 +132,21 @@ let session = {}
 // as {text: String} from answer().
 function respond(input, answer) {
   let query = bot.guess(input)
+  if (query.label === 'locate' &&
+      (session.askedOrigin || session.askedDestination)) {
+    query.label = 'search'
+  }
+
   if (query.label === 'search') {
-    session.origin = query.parameters.location || session.origin
-    session.destination = query.parameters.destination || session.destination
+    if (session.askedDestination) {
+      session.destination = query.parameters.location || session.origin
+    } else {
+      session.origin = query.parameters.location || session.origin
+      session.destination = query.parameters.destination || session.destination
+    }
+    session.askedOrigin = false
+    session.askedDestination = false
+
     if (session.origin !== undefined &&
         session.destination !== undefined) {
       let origin = station.id(session.origin)
@@ -149,18 +160,18 @@ function respond(input, answer) {
         travel.search(origin.id, destination.id, {departure})
         .then(travelPlans => answer({text: stringTravelPlans(travelPlans)}))
         .catch(e => { console.error(e); answer({text: stringError(e)}) })
-        return
       }
-    }
     // If we have not returned yet, we are missing data.
-    if (session.origin === undefined &&
+    } else if (session.origin === undefined &&
         session.destination === undefined) {
       answer({text: 'Well, where will you come from, and where will you go, ' +
         'Cotton-Eye Joe?'})
     } else if (session.origin === undefined) {
       answer({text: 'Where will you leave from?'})
+      session.askedOrigin = true
     } else {
       answer({text: 'Where do you want to go?'})
+      session.askedDestination = true
     }
   } else if (query.label === 'locate') {
     session.location = query.parameters.location || session.location
