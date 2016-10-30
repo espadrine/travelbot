@@ -3,6 +3,12 @@ const travelbot = require('travelbot')
 console.log(travelbot.respond({text: 'Get me from Paris to Berlin.'}).text)
 ```
 
+Relies on [queread][] for natural language processing and [travel-scrapper][]
+for data.
+
+[queread]: https://github.com/espadrine/queread
+[travel-scrapper]: https://github.com/espadrine/travel-scrapper
+
 # Interface
 ```
 Hello!
