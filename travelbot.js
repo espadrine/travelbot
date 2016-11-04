@@ -130,8 +130,12 @@ let session = {}
 
 // Read some natural language input, return responses
 // as {text: String} from answer().
+// input: string or {text}.
 function respond(input, answer) {
-  let query = bot.guess(input)
+  if (typeof input === 'string') {
+    input = {text: input}
+  }
+  let query = bot.guess(input.text)
   if (query.label === 'locate' &&
       (session.askedOrigin || session.askedDestination)) {
     query.label = 'search'
