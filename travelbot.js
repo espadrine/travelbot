@@ -287,3 +287,4 @@ function stringError(e) {
 }
 
 module.exports = respond
+module.exports.queread = bot
