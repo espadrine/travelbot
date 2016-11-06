@@ -35,7 +35,12 @@ bot.addParameter(function locationParameter(tokens) {
   if (match == null) {return}
   let station = stationMatch(match[0])
   if (station !== undefined) {
-    return { tag: 'location', length: match[0].length, data: station.id }
+    if (tokens.tokens.some(token => token.tag === 'location')) {
+      // If there already was a location, this one is a destination.
+      return { tag: 'destination', length: match[0].length, data: station.id }
+    } else {
+      return { tag: 'location', length: match[0].length, data: station.id }
+    }
   }
   let previousToken = tokens.last()
   if (previousToken !== undefined && previousToken.type === 'word') {
